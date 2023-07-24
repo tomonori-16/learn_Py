@@ -2,42 +2,42 @@ import csv
 from pathlib import Path
 import re
 
-pathCwd = Path.cwd() #ƒJƒŒƒ“ƒgƒpƒX‚ğİ’è
+pathCwd = Path.cwd() #ã‚«ãƒ¬ãƒ³ãƒˆãƒ‘ã‚¹ã‚’è¨­å®š
 print(pathCwd)
 
-CSVFILENAME = 'contactSrchResult.csv' # AmazonConnct‚ÌƒRƒ“ƒ^ƒNƒgƒƒOƒtƒ@ƒCƒ‹
-CLWLOGFILENAME = 'cwl.txt'           # Cloud Watch‚ÌƒƒOƒtƒ@ƒCƒ‹
-CONECTIDCSV = 'AzcContactId'          # ConnectId ‚Ì€–Ú–¼(AmazonConnect‚ÌƒƒOƒtƒ@ƒCƒ‹)
-CONNECTIDCLW = 'ContactId'            # CloudWatch‚ÌƒƒOƒtƒ@ƒCƒ‹
-RETURNCSV = 'wokrfile.csv'            # "Error"‚Æ‚¢‚¤’PŒê‚ğŠÜ‚ñ‚¾log‚Ìˆê——(’A‚µ—]Œv‚È‰üs‚ªc‚é)
-RESULTCSV = 'about_error_string.csv'  # ÅIŒ‹‰Ê"Error"‚Æ‚¢‚¤’PŒê‚ğŠÜ‚ñ‚¾log‚Ìˆê——
+CSVFILENAME = 'contactSrchResult.csv' # AmazonConnctã®ã‚³ãƒ³ã‚¿ã‚¯ãƒˆãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«
+CLWLOGFILENAME = 'cwl.txt'           # Cloud Watchã®ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«
+CONECTIDCSV = 'AzcContactId'          # ConnectId ã®é …ç›®å(AmazonConnectã®ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«)
+CONNECTIDCLW = 'ContactId'            # CloudWatchã®ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«
+RETURNCSV = 'wokrfile.csv'            # "Error"ã¨ã„ã†å˜èªã‚’å«ã‚“ã logã®ä¸€è¦§(ä½†ã—ä½™è¨ˆãªæ”¹è¡ŒãŒæ®‹ã‚‹)
+RESULTCSV = 'about_error_string.csv'  # æœ€çµ‚çµæœ"Error"ã¨ã„ã†å˜èªã‚’å«ã‚“ã logã®ä¸€è¦§
 
 def import_contactSrc_csv():
-    # Amazon Connect‚ÌØ’f‚Ì—š—ğ‚ğæ‚è‚Ş
-    # æ‚è‚Şƒtƒ@ƒCƒ‹‚ÍcsvŒ`®
-    # æ‚è‚ñ‚¾Œ‹‰Ê‚ğlist‚Å•Ô‚·
+    # Amazon Connectã®åˆ‡æ–­ã®å±¥æ­´ã‚’å–ã‚Šè¾¼ã‚€
+    # å–ã‚Šè¾¼ã‚€ãƒ•ã‚¡ã‚¤ãƒ«ã¯csvå½¢å¼
+    # å–ã‚Šè¾¼ã‚“ã çµæœã‚’listã§è¿”ã™
     with open(Path(pathCwd/Path(CSVFILENAME)))as csvf:
         csvFileDicObj = csv.DictReader(csvf)
         csvFileDicList = [row for row in csvFileDicObj]
     return csvFileDicList
 
 def import_wlog_txt():
-    # Amazon Connect‚ÌCloud Watch log‚ğæ‚è‚Ş
-    # æ‚è‚Şƒtƒ@ƒCƒ‹‚ÍtxtŒ`®
-    # æ‚è‚ñ‚¾Œ‹‰Ê‚ğlist‚Å•Ô‚·B
+    # Amazon Connectã®Cloud Watch logã‚’å–ã‚Šè¾¼ã‚€
+    # å–ã‚Šè¾¼ã‚€ãƒ•ã‚¡ã‚¤ãƒ«ã¯txtå½¢å¼
+    # å–ã‚Šè¾¼ã‚“ã çµæœã‚’listã§è¿”ã™ã€‚
     with open(Path(pathCwd/Path(CLWLOGFILENAME)),mode='r',encoding='utf-8') as textf:
         cwlRowList = []
         cwlRow = textf.readline()
         cwlRowList.append(cwlRow)
-        while cwlRow != '':     # “Ç‚İ‚İs‚ª‹ó‚É‚È‚é‚Ü‚Å
+        while cwlRow != '':     # èª­ã¿è¾¼ã¿è¡ŒãŒç©ºã«ãªã‚‹ã¾ã§
             cwlRow = textf.readline()
             cwlRowList.append(cwlRow)
     return cwlRowList
 
 class WlogClass:
-    # cloud Watch log‚Ìlist‚ğ•Û‚·‚éƒNƒ‰ƒXB
-    # ŒÄ‚Ño‚µŒ³‚©‚çƒZƒbƒg‚³‚ê‚½ƒpƒ‰ƒ[ƒ^‚ğŠÜ‚ŞƒƒO‚ª‚ ‚ê‚Î‚»‚ê‚ğ•Ô‚·B
-    # ŒÄ‚Ño‚³‚ê‚½ƒƒO‚ÍWlogClass‚©‚çíœ‚·‚é
+    # cloud Watch logã®listã‚’ä¿æŒã™ã‚‹ã‚¯ãƒ©ã‚¹ã€‚
+    # å‘¼ã³å‡ºã—å…ƒã‹ã‚‰ã‚»ãƒƒãƒˆã•ã‚ŒãŸãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’å«ã‚€ãƒ­ã‚°ãŒã‚ã‚Œã°ãã‚Œã‚’è¿”ã™ã€‚
+    # å‘¼ã³å‡ºã•ã‚ŒãŸãƒ­ã‚°ã¯WlogClassã‹ã‚‰å‰Šé™¤ã™ã‚‹
     clwLogList=[]
 
     def __init__(self) -> None:
@@ -45,19 +45,19 @@ class WlogClass:
 
     @classmethod
     def _deleteST(cls,tgIndex):
-       # ŒŸõ‚ÅŒÄ‚Ño‚³‚ê‚½ƒƒO‚Ííœ‚·‚é
+       # æ¤œç´¢ã§å‘¼ã³å‡ºã•ã‚ŒãŸãƒ­ã‚°ã¯å‰Šé™¤ã™ã‚‹
        del cls.clwLogList[tgIndex]
 
     @classmethod
     def searchLogText(cls,argContactID):
-        # ƒRƒ“ƒ^ƒNƒgID‚ÅCloud Watch‚ÌƒƒOƒeƒLƒXƒg‚ğŒŸõ‚·‚éB
+        # ã‚³ãƒ³ã‚¿ã‚¯ãƒˆIDã§Cloud Watchã®ãƒ­ã‚°ãƒ†ã‚­ã‚¹ãƒˆã‚’æ¤œç´¢ã™ã‚‹ã€‚
         count = 0
         outPutValue = 'NoErrorString'
         for row in cls.clwLogList:
-           # print('ŒŸõ•¶š{c} ‘ÎÛ•¶š—ñ{r}'.format(r=row,c=argContactID))
+           # print('æ¤œç´¢æ–‡å­—{c} å¯¾è±¡æ–‡å­—åˆ—{r}'.format(r=row,c=argContactID))
             if argContactID in row:
                 outPutValue = row
-                # ƒƒO‚ğ•Ô‚µ‚½‚çA“–ŠYƒƒO‚ÍclwLogList‚©‚çíœ‚·‚é
+                # ãƒ­ã‚°ã‚’è¿”ã—ãŸã‚‰ã€å½“è©²ãƒ­ã‚°ã¯clwLogListã‹ã‚‰å‰Šé™¤ã™ã‚‹
                 cls._deleteST(tgIndex=count)
                 return outPutValue
             count+=1
@@ -65,28 +65,28 @@ class WlogClass:
 
 
 def concatDict(argCnntactFlowDict,argCloudWatchLogText):
-    # Œ‹‡‚³‚ê‚½dict‚ğ•Ô‚·B
+    # çµåˆã•ã‚ŒãŸdictã‚’è¿”ã™ã€‚
     #argCnntactFlowDict.update(CloudWatchLog=argCloudWatchLogText)
-    outPutDict = {key:item for key,item in argCnntactFlowDict.items()}   # •Ô‹p—p‚ÌDict‚ğì¬
-    outPutDict.update(CloudWatchLog=re.sub('\n','',argCloudWatchLogText))   # •Ô‹p—p‚ÌDict‚ÉCLW‚ÌƒƒO‚ğ’Ç‰Á
+    outPutDict = {key:item for key,item in argCnntactFlowDict.items()}   # è¿”å´ç”¨ã®Dictã‚’ä½œæˆ
+    outPutDict.update(CloudWatchLog=re.sub('\n','',argCloudWatchLogText))   # è¿”å´ç”¨ã®Dictã«CLWã®ãƒ­ã‚°ã‚’è¿½åŠ 
     return outPutDict
 
 def makeLastCsv(argConncatLogTexDictList):
-    # AmazonConnect‚ÆCloud Watch‚ÌƒƒO‚ª‚Ü‚Æ‚Ü‚Á‚½Dict‚ªList‚É“Z‚Ü‚Á‚Ä
-    # “n‚³‚ê‚é‚Ì‚ÅAList‚ğ“WŠJ‚µ‚È‚ª‚çADict‚ğcsvƒtƒ@ƒCƒ‹‚É•Û‘¶‚µ‚Ä‚¢‚­B
+    # AmazonConnectã¨Cloud Watchã®ãƒ­ã‚°ãŒã¾ã¨ã¾ã£ãŸDictãŒListã«çºã¾ã£ã¦
+    # æ¸¡ã•ã‚Œã‚‹ã®ã§ã€Listã‚’å±•é–‹ã—ãªãŒã‚‰ã€Dictã‚’csvãƒ•ã‚¡ã‚¤ãƒ«ã«ä¿å­˜ã—ã¦ã„ãã€‚
     count = 0
     with open(Path(pathCwd/Path(RETURNCSV)),'w',encoding='utf-8') as f:
-        # dict‚Ìlist‚ğ“WŠJ‚µ‚È‚ª‚çAcsvƒtƒ@ƒCƒ‹‚É‘‚«‚ñ‚Å‚¢‚­B
+        # dictã®listã‚’å±•é–‹ã—ãªãŒã‚‰ã€csvãƒ•ã‚¡ã‚¤ãƒ«ã«æ›¸ãè¾¼ã‚“ã§ã„ãã€‚
         for csvRowDict in argConncatLogTexDictList:
             if count == 0:
-                # Å‰‚Ícsv.DictWriter‚Ìæ“¾‚ÆAcsv‚Ì€–Ús‚Ìì¬
+                # æœ€åˆã¯csv.DictWriterã®å–å¾—ã¨ã€csvã®é …ç›®è¡Œã®ä½œæˆ
                 csvHedderStr = csvRowDict.keys()
                 csvWriter = csv.DictWriter(f,csvHedderStr)
                 csvWriter.writeheader()
             csvWriter.writerow(csvRowDict)
             count+=1
 
-    # csvƒtƒ@ƒCƒ‹‚Ìs“ª‚É‰üs‚ª“ü‚é‚Ì‚Åíœ‚·‚éˆ—B
+    # csvãƒ•ã‚¡ã‚¤ãƒ«ã®è¡Œé ­ã«æ”¹è¡ŒãŒå…¥ã‚‹ã®ã§å‰Šé™¤ã™ã‚‹å‡¦ç†ã€‚
     with open(Path(pathCwd/Path(RETURNCSV)),'r',encoding='utf-8') as fReader,\
             open(Path(pathCwd/Path(RESULTCSV )),'w',encoding='utf-8') as fWriter:
         for row in fReader:
@@ -94,22 +94,22 @@ def makeLastCsv(argConncatLogTexDictList):
             fWriter.write(row)
 
 if __name__ == "__main__":
-    # dicŒ^‚ğ“à•ï‚µ‚½list‚ÅAmazon Connect‚ÌƒƒO(csvƒtƒ@ƒCƒ‹Œ`®)‚ğæ‚è‚Ş
+    # dicå‹ã‚’å†…åŒ…ã—ãŸlistã§Amazon Connectã®ãƒ­ã‚°(csvãƒ•ã‚¡ã‚¤ãƒ«å½¢å¼)ã‚’å–ã‚Šè¾¼ã‚€
     conntactFlowDicList = import_contactSrc_csv()
 
-    # dicŒ^‚ÅCloud Watch ‚ÌƒƒO‚ğæ‚è‚Ş
+    # dicå‹ã§Cloud Watch ã®ãƒ­ã‚°ã‚’å–ã‚Šè¾¼ã‚€
     cloudWatchDicList =  import_wlog_txt()
     #print(cloudWatchDicList)
 
-    # cloudWatch‚ÌƒƒO‚ğ‘€ì‘ÎÛ‚Æ‚µ‚ÄƒZƒbƒg
+    # cloudWatchã®ãƒ­ã‚°ã‚’æ“ä½œå¯¾è±¡ã¨ã—ã¦ã‚»ãƒƒãƒˆ
     WlogClass.clwLogList = cloudWatchDicList
 
-    # Amazon Connect‚ÌƒRƒ“ƒ^ƒNƒgƒƒO‚ÆCloud Watch‚ÌƒƒO‚ğŒ‹‡‚·‚é
-    conncatLogTextDicList = []  # dicŒ^‚Åì¬‚µ‚½Œ‹‡‚µ‚½1s‚ğ‚Ü‚Æ‚ß‚½List
+    # Amazon Connectã®ã‚³ãƒ³ã‚¿ã‚¯ãƒˆãƒ­ã‚°ã¨Cloud Watchã®ãƒ­ã‚°ã‚’çµåˆã™ã‚‹
+    conncatLogTextDicList = []  # dicå‹ã§ä½œæˆã—ãŸçµåˆã—ãŸ1è¡Œã‚’ã¾ã¨ã‚ãŸList
     for csvRow  in conntactFlowDicList:
-        sarchConntactId = csvRow[CONECTIDCSV]   # Amazon Connect‚Ìcsvƒtƒ@ƒCƒ‹‚©‚çconntactID‚ğæ“¾
+        sarchConntactId = csvRow[CONECTIDCSV]   # Amazon Connectã®csvãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰conntactIDã‚’å–å¾—
         clwlgTxt = WlogClass.searchLogText(argContactID=sarchConntactId)
         logTxtLine = concatDict(argCnntactFlowDict=csvRow,argCloudWatchLogText=clwlgTxt)
-        # AmazonConnect‚ÌConntactlog‚ÆcludWatch‚ÌƒƒO‚ğŒ‹‡‚µ‚Äì¬‚µ‚½Dict‚ğAcsvŒ`®‚Å•Û‘¶‚·‚éB
+        # AmazonConnectã®Conntactlogã¨cludWatchã®ãƒ­ã‚°ã‚’çµåˆã—ã¦ä½œæˆã—ãŸDictã‚’ã€csvå½¢å¼ã§ä¿å­˜ã™ã‚‹ã€‚
         conncatLogTextDicList.append(logTxtLine)
         makeLastCsv(argConncatLogTexDictList=conncatLogTextDicList)
