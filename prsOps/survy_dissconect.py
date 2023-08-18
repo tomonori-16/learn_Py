@@ -162,7 +162,7 @@ def makeCsv(argCsvList):
     try:
         with open(Path(pathCwd/Path(RETURNCSV)),'w',encoding='utf-8') as f:
             # dictのlistを展開しながら、csvファイルに書き込んでいく。
-            for csvRowDict in argConncatLogTexDictList:
+            for csvRowDict in argCsvList:
                 if count == 0:
                     # 最初はcsv.DictWriterの取得と、csvの項目行の作成
                     csvHedderStr = csvRowDict.keys()
@@ -260,7 +260,7 @@ if __name__ == "__main__":
             sarchConntactId = csvRow[CONECTIDCSV]   # Amazon ConnectのcsvファイルからconntactIDを取得
             clwlgTxt = WlogClass.searchLogText(argContactID=sarchConntactId)
             # AmazonConnectのConntactlogとcludWatchのログを結合してDictで保存する。
-            logTxtLine = concatDict(argCnntactFlowDict=csvRow,argCloudWatchLogText=clwlgTxt)
+            logTxtLine = concatDict(argCnntactFlowDict=csvRow,argCloudWatchLogText=clwlgTxt.return_Value)
             if logTxtLine.status:
                 conncatLogTextDicList.append(logTxtLine.return_Value)
             else:
