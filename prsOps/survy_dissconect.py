@@ -18,7 +18,7 @@ class outputValueClass:
     # 正常／異常終了のステータスを格納するインスタンス変数
     # 出力結果を格納するフィールド
     # まずは、値を格納するメソッド無しでやってみる。
-    
+
     def __init__(self) -> None:
         self.status = True
         self.return_Value = None
@@ -84,21 +84,21 @@ def import_contactSrc_csv():
     # Connectのログはcsv形式で出力されるが、
     # ConnectIDをConnectのログから抽出する際に
     # Connectの1行のレコードがDict形式であった方が都合が良いので、
-    # 1行分をDictにして、それをListに纏めて返す。 
+    # 1行分をDictにして、それをListに纏めて返す。
     outputValue = outputValueClass()
     try:
         with open(Path(pathCwd/Path(CSVFILENAME)))as csvf:
             csvFileDicObj = csv.DictReader(csvf)
             csvFileDicList = [row for row in csvFileDicObj]
         outputValue.return_Value = csvFileDicList
-        return outputValue 
+        return outputValue
     except OSError as e:
         print(e.args)
         print("Connectのログファイル(CSVファイル)を開くことができません。")
         outputValue.status = False
-        return outputValue 
+        return outputValue
     except Exception as e:
-        print(e.args) 
+        print(e.args)
         print('Connectのログファイル読み込みでExceptionが発生しました。')
         outputValue.status = False
         return outputValue
@@ -130,7 +130,7 @@ def import_wlog_txt():
         outputValue.status = False
         return outputValue
     except Exception as e:
-        print(e.args) 
+        print(e.args)
         print('CloudWatchのログファイル読み込みでExceptionが発生しました。')
         outputValue.status = False
         return outputValue
@@ -168,7 +168,7 @@ def makeCsv(argCsvList):
                     csvHedderStr = csvRowDict.keys()
                     csvWriter = csv.DictWriter(f,csvHedderStr)
                     csvWriter.writeheader()
-                else:    
+                else:
                     csvWriter.writerow(csvRowDict)
                 count+=1
             return outputValue
@@ -206,7 +206,7 @@ def eraseNewLineAtBiginningOfLine():
         outputValue.status = False
         return outputValue
 
-    
+
 def makeLastCsv(argConncatLogTexDictList):
     outputValue = outputValueClass()
     try:
@@ -233,7 +233,7 @@ def makeLastCsv(argConncatLogTexDictList):
         outputValue.status =False
         return outputValue
 
-   
+
     return outputValue  # 成功した場合はステータスTrueを返す
 
 if __name__ == "__main__":
@@ -244,7 +244,7 @@ if __name__ == "__main__":
             pass
         else:
             sys.exit()
-        
+
 
         # dic型でCloud Watch のログを取り込む
         importWlogTxtOutputValue = import_wlog_txt()
