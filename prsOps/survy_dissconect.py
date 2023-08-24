@@ -62,8 +62,8 @@ class WlogClass:
                 # print('検索文字{c} 対象文字列{r}'.format(r=row,c=argContactID))
                 if argContactID in row:
                     outputValue.return_Value = row
-                    # 本来はlistのpopメソッドを使えば良いが、学習用プロジェクトの為そのまま
                     # ログを返したら、当該ログはclwLogListから削除する
+                    # 本来はlistのpopメソッドを使えば良いが、学習用プロジェクトの為そのまま
                     if cls._deleteST(tgIndex=count):
                         pass
                     else:
@@ -111,18 +111,15 @@ def import_wlog_txt():
     # Cloud Watch のAmazon Connectのlogを取り込む
     # 取り込むファイルはtxt形式
     # 取り込んだ結果をlistで返す。
-    # todo: with open ではなくて、open → for ～ enumerate() → close()で再構成する
     outputValue = outputValueClass()
     try:
-        with open(Path(pathCwd/Path(CLWLOGFILENAME)),mode='r',encoding='utf-8') as textf:
-            cwlRowList = []
-            while True:
-                cwlRow = textf.readline()
-                if cwlRow == '':    # 読み込み行が空になるまで
-                    break
-                cwlRowList.append(cwlRow)
-
+        textf = open(Path(pathCwd/Path(CLWLOGFILENAME)),mode='r',encoding='utf-8')
+        cwlRowList = []
+        for count,cwlRow in enumerate(textf,start=1):
+            cwlRowList.append(cwlRow)
+        textf.close()
         outputValue.return_Value = cwlRowList
+        print('cloudWatchのLogは{}件'.format(count))
         return outputValue
     except OSError as e:
         print(e.args)
