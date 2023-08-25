@@ -3,6 +3,8 @@ import csv
 from pathlib import Path
 import re
 
+import common.usedAnyW as usdaw
+
 pathCwd = Path.cwd() #カレントパスを設定
 print(pathCwd)
 
@@ -13,15 +15,15 @@ CONNECTIDCLW = 'ContactId'            # CloudWatchのログファイル
 RETURNCSV = 'wokrfile.csv'            # "Error"という単語を含んだlogの一覧(但し余計な改行が残る)
 RESULTCSV = 'about_error_string.csv'  # 最終結果"Error"という単語を含んだlogの一覧
 
-class outputValueClass:
-    # 各メソッドの返り値を格納するクラス
-    # 正常／異常終了のステータスを格納するインスタンス変数
-    # 出力結果を格納するフィールド
-    # まずは、値を格納するメソッド無しでやってみる。
-
-    def __init__(self) -> None:
-        self.status = True
-        self.return_Value = None
+#class outputValueClass:
+#    # 各メソッドの返り値を格納するクラス
+#    # 正常／異常終了のステータスを格納するインスタンス変数
+#    # 出力結果を格納するフィールド
+#    # まずは、値を格納するメソッド無しでやってみる。
+#
+#    def __init__(self) -> None:
+#        self.status = True
+#        self.return_Value = None
 
 class WlogClass:
     # cloud Watch logのlistを保持するクラス。
@@ -36,7 +38,7 @@ class WlogClass:
     def _deleteST(cls,tgIndex):
        # 検索で呼び出されたログは削除する
        # 本来はlistのpopメソッドを使えば良いが、学習プロジェクトの為そのまま
-        outputValue = outputValueClass()
+        outputValue = usdaw.outputValueClass()
         try:
             del cls.clwLogList[tgIndex]
             return outputValue  # 成功した場合はステータスTrueを返す
@@ -55,7 +57,7 @@ class WlogClass:
     def searchLogText(cls,argContactID):
         # コンタクトIDでCloud Watchのログテキストを検索する。
         count = 0
-        outputValue = outputValueClass()
+        outputValue = usdaw.outputValueClass()
         outputValue.return_Value = 'NoErrorString'
         try:
             for row in cls.clwLogList:
@@ -85,7 +87,7 @@ def import_contactSrc_csv():
     # ConnectIDをConnectのログから抽出する際に
     # Connectの1行のレコードがDict形式であった方が都合が良いので、
     # 1行分をDictにして、それをListに纏めて返す。
-    outputValue = outputValueClass()
+    outputValue = usdaw.outputValueClass()
     try:
         with open(Path(pathCwd/Path(CSVFILENAME)))as csvf:
             csvFileDicObj = csv.DictReader(csvf)
@@ -111,7 +113,7 @@ def import_wlog_txt():
     # Cloud Watch のAmazon Connectのlogを取り込む
     # 取り込むファイルはtxt形式
     # 取り込んだ結果をlistで返す。
-    outputValue = outputValueClass()
+    outputValue = usdaw.outputValueClass()
     try:
         textf = open(Path(pathCwd/Path(CLWLOGFILENAME)),mode='r',encoding='utf-8')
         cwlRowList = []
@@ -139,7 +141,7 @@ def import_wlog_txt():
 def concatDict(argCnntactFlowDict,argCloudWatchLogText):
     # 結合されたdictを返す。
     #argCnntactFlowDict.update(CloudWatchLog=argCloudWatchLogText)
-    outputValue = outputValueClass()
+    outputValue = usdaw.outputValueClass()
     try:
         outPutDict = {key:item for key,item in argCnntactFlowDict.items()}   # 返却用のDictを作成
         outPutDict.update(CloudWatchLog=re.sub('\n','',argCloudWatchLogText))   # 返却用のDictにCLWのログを追加
@@ -155,7 +157,7 @@ def makeCsv(argCsvList):
     # AmazonConnectとCloud WatchのログがまとまったDictがListに纏まって
     # 渡されるので、Listを展開しながら、Dictをcsvファイルに保存していく。
     count = 0
-    outputValue = outputValueClass()
+    outputValue = usdaw.outputValueClass()
     try:
         with open(Path(pathCwd/Path(RETURNCSV)),'w',encoding='utf-8') as f:
             # dictのlistを展開しながら、csvファイルに書き込んでいく。
@@ -183,7 +185,7 @@ def makeCsv(argCsvList):
 
 def eraseNewLineAtBiginningOfLine():
     # csvファイルの行頭に改行が入るので削除する処理。
-    outputValue = outputValueClass()
+    outputValue = usdaw.outputValueClass()
     try:
         with open(Path(pathCwd/Path(RETURNCSV)),'r',encoding='utf-8') as fReader,\
                 open(Path(pathCwd/Path(RESULTCSV )),'w',encoding='utf-8') as fWriter:
@@ -205,7 +207,7 @@ def eraseNewLineAtBiginningOfLine():
 
 
 def makeLastCsv(argConncatLogTexDictList):
-    outputValue = outputValueClass()
+    outputValue = usdaw.outputValueClass()
     try:
         # AmazonConnectとCloud WatchのログがまとまったDictがListに纏まって
         # 渡されるので、Listを展開しながら、Dictをcsvファイルに保存していく。
