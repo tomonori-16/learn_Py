@@ -15,16 +15,6 @@ CONNECTIDCLW = 'ContactId'            # CloudWatchのログファイル
 RETURNCSV = 'wokrfile.csv'            # "Error"という単語を含んだlogの一覧(但し余計な改行が残る)
 RESULTCSV = 'about_error_string.csv'  # 最終結果"Error"という単語を含んだlogの一覧
 
-#class outputValueClass:
-#    # 各メソッドの返り値を格納するクラス
-#    # 正常／異常終了のステータスを格納するインスタンス変数
-#    # 出力結果を格納するフィールド
-#    # まずは、値を格納するメソッド無しでやってみる。
-#
-#    def __init__(self) -> None:
-#        self.status = True
-#        self.return_Value = None
-
 class WlogClass:
     # cloud Watch logのlistを保持するクラス。
     # 呼び出し元からセットされたパラメータを含むログがあればそれを返す。
