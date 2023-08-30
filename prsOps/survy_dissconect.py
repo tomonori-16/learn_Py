@@ -1,3 +1,9 @@
+""" Cloud Watchに保存されているAmazon Connectに関するログをから"Error"
+    という単語が含まれている文字列を抜き出したファイルを用意して、
+    Amazon Connectのコンタクトログも用意する。
+    その両ファイルの文字列をContactIDで結合して、Amazon Connectの
+    コンタクトフローによる切断の原因を調査する為のファイルを作成する。
+"""
 import sys
 import csv
 from pathlib import Path
@@ -9,16 +15,18 @@ pathCwd = Path.cwd() #カレントパスを設定
 print(pathCwd)
 
 CSVFILENAME = 'contactSrchResult.csv' # AmazonConnctのコンタクトログファイル
-CLWLOGFILENAME = 'cwl.txt'           # Cloud Watchのログファイル
+CLWLOGFILENAME = 'cwl.txt'            # Cloud Watchのログファイル
 CONECTIDCSV = 'AzcContactId'          # ConnectId の項目名(AmazonConnectのログファイル)
 CONNECTIDCLW = 'ContactId'            # CloudWatchのログファイル
 RETURNCSV = 'wokrfile.csv'            # "Error"という単語を含んだlogの一覧(但し余計な改行が残る)
 RESULTCSV = 'about_error_string.csv'  # 最終結果"Error"という単語を含んだlogの一覧
 
 class WlogClass:
-    # cloud Watch logのlistを保持するクラス。
-    # 呼び出し元からセットされたパラメータを含むログがあればそれを返す。
-    # 呼び出されたログはWlogClassから削除する
+    """ cloud Watch logの1行ごとをlistで保持するクラス。
+
+        引数で渡された文字列を含むログがあればそれを返す。
+        呼び出されたログはWlogClassから削除する
+    """
     clwLogList=[]
 
     def __init__(self) -> None:
@@ -26,8 +34,14 @@ class WlogClass:
 
     @classmethod
     def _deleteST(cls,tgIndex):
-       # 検索で呼び出されたログは削除する
-       # 本来はlistのpopメソッドを使えば良いが、学習プロジェクトの為そのまま
+        """ 取得されたリストの要素を削除する。
+            本来はlistのpopメソッドを使えば良いが、学習プロジェクトの為そのまま
+
+            Parameters
+            ----------
+            tgIndex:int
+                    clwLogListから削除する要素のインディックス番号
+        """
         outputValue = usdaw.outputValueClass()
         try:
             del cls.clwLogList[tgIndex]
@@ -45,7 +59,21 @@ class WlogClass:
 
     @classmethod
     def searchLogText(cls,argContactID):
-        # コンタクトIDでCloud Watchのログテキストを検索する。
+        """ コンタクトIDでCloud Watchのログテキストを検索する。
+            引数で渡された文字列で、clwLogListを検索する。
+            該当するListの要素があればそれを返す。
+
+            Parameters:
+            ----------
+            argContactID:string
+                コンタクトID（文字列）
+
+            Returns:
+            ----------
+            outputValue:outputValueClass
+                return_ValueにコンタクトIDに該当したListの要素(string)
+                statusに処理結果（正常／異常終了）のステータス(boolean)
+        """
         count = 0
         outputValue = usdaw.outputValueClass()
         outputValue.return_Value = 'NoErrorString'
@@ -72,11 +100,24 @@ class WlogClass:
 
 
 def import_contactSrc_csv():
-    # Amazon Connectの切断の履歴を取り込む
-    # Connectのログはcsv形式で出力されるが、
-    # ConnectIDをConnectのログから抽出する際に
-    # Connectの1行のレコードがDict形式であった方が都合が良いので、
-    # 1行分をDictにして、それをListに纏めて返す。
+    """ Amazon Connectの切断の履歴を取り込む
+
+        Connectのログはcsv形式で出力されるが、
+        ConnectIDをConnectのログから抽出する際に
+        Connectの1行のレコードがDict形式であった方が都合が良いので、
+        1行分をDictにして、それをListに纏めて返す。
+        csvファイル明は固定で、定数CSVFILENAMEに設定する
+
+        Parameters:
+        ----------
+            無し
+
+        Returns:
+        ----------
+        outputValue:outputValueClass
+            return_Valueにcsvの1行をdict形式にして纏めたList
+            statusに処理結果（正常／異常終了）のステータス(boolean)
+    """
     outputValue = usdaw.outputValueClass()
     try:
         with open(Path(pathCwd/Path(CSVFILENAME)))as csvf:
@@ -100,9 +141,21 @@ def import_contactSrc_csv():
         return outputValue
 
 def import_wlog_txt():
-    # Cloud Watch のAmazon Connectのlogを取り込む
-    # 取り込むファイルはtxt形式
-    # 取り込んだ結果をlistで返す。
+    """ Cloud Watch のAmazon Connectのlogを取り込む
+
+        txt形式のAmazon Connectのログの1行ごとを要素としたListを返す
+        ログファイル名は定数CLWLOGFILENAMEに設定する。
+
+        Parameters:
+        ----------
+                無し
+
+        Returns:
+        ----------
+        outputValue:outputValueClass
+            return_Valueにテキストファイルの1行を纏めたList
+            statusに処理結果（正常／異常終了）のステータス(boolean)
+    """
     outputValue = usdaw.outputValueClass()
     try:
         textf = open(Path(pathCwd/Path(CLWLOGFILENAME)),mode='r',encoding='utf-8')
@@ -129,8 +182,21 @@ def import_wlog_txt():
         return outputValue
 
 def concatDict(argCnntactFlowDict,argCloudWatchLogText):
-    # 結合されたdictを返す。
-    #argCnntactFlowDict.update(CloudWatchLog=argCloudWatchLogText)
+    """ Amazon Connectのログ（dict）とCloud Watchのログ（str）を結合したdictを返す。
+
+        Parameters:
+        ----------
+        argCnntactFlowDict:Dict
+             Amazon connectのログ1行分
+        argCloudWatchLogTex:string
+                cloud Watchのログ1行分
+
+        Returns:
+        ----------
+        outputValue:outputValueClass
+            return_Valueに結合したログ(dict)
+            statusに処理結果（正常／異常終了）のステータス(boolean)
+    """
     outputValue = usdaw.outputValueClass()
     try:
         outPutDict = {key:item for key,item in argCnntactFlowDict.items()}   # 返却用のDictを作成
@@ -144,8 +210,21 @@ def concatDict(argCnntactFlowDict,argCloudWatchLogText):
         return outputValue
 
 def makeCsv(argCsvList):
-    # AmazonConnectとCloud WatchのログがまとまったDictがListに纏まって
-    # 渡されるので、Listを展開しながら、Dictをcsvファイルに保存していく。
+    """ AmazonConnectとCloud Watchのログを結合したDictがListに纏まって
+        渡されるので、Listを展開しながら、Dictをcsvファイルに保存していく。
+        作成されるcsvファイル名は、定数RETURNCSVに設定する。
+        Parameters:
+        ----------
+        argCsvList:List
+             Amazon connectとCloud Watchのログ1行分(dict)を纏めたList
+
+        Returns:
+        ----------
+        outputValue:outputValueClass
+            return_Valueは設定無し
+            statusに処理結果（正常／異常終了）のステータス(boolean)
+
+    """
     count = 0
     outputValue = usdaw.outputValueClass()
     try:
@@ -174,7 +253,17 @@ def makeCsv(argCsvList):
         return outputValue
 
 def eraseNewLineAtBiginningOfLine():
-    # csvファイルの行頭に改行が入るので削除する処理。
+    """ csvファイルの行頭に改行が入るので削除する処理。
+        定数RETURNCSVに設定されたファイル名のcsvファイルをオープンし、
+        行頭のスペースを削除しながら、
+        定数RESULTCSVに設定されたファイル名のcsvファイルに保存する。
+
+        Returns:
+        ----------
+        outputValue:outputValueClass
+            return_Valueは設定無し
+            statusに処理結果（正常／異常終了）のステータス(boolean)
+    """
     outputValue = usdaw.outputValueClass()
     try:
         with open(Path(pathCwd/Path(RETURNCSV)),'r',encoding='utf-8') as fReader,\
@@ -197,10 +286,12 @@ def eraseNewLineAtBiginningOfLine():
 
 
 def makeLastCsv(argConncatLogTexDictList):
+    """ AmazonConnectとCloud WatchのログがまとまったDictがListに纏まって
+        渡されるので、Listを展開しながら、Dictをcsvファイルに保存していく。
+
+    """
     outputValue = usdaw.outputValueClass()
     try:
-        # AmazonConnectとCloud WatchのログがまとまったDictがListに纏まって
-        # 渡されるので、Listを展開しながら、Dictをcsvファイルに保存していく。
         makeCsvOutputValue = makeCsv(argConncatLogTexDictList)
         if makeCsvOutputValue.status:
             pass
