@@ -35,7 +35,8 @@ class WlogClass:
     @classmethod
     def _deleteST(cls,tgIndex):
         """ 取得されたリストの要素を削除する。
-            本来はlistのpopメソッドを使えば良いが、学習プロジェクトの為そのまま
+            本来はlistのpopメソッドを使えば不要なメソッドだが、
+            学習プロジェクトの為そのまま利用する。
 
             Parameters
             ----------
@@ -55,7 +56,6 @@ class WlogClass:
             print('検索対象listの削除失敗')
             outputValue.status = False
             return outputValue
-
 
     @classmethod
     def searchLogText(cls,argContactID):
@@ -96,8 +96,6 @@ class WlogClass:
             print('検索失敗')
             outputValue.status = False
             return outputValue
-
-
 
 def import_contactSrc_csv():
     """ Amazon Connectの切断の履歴を取り込む
@@ -284,7 +282,6 @@ def eraseNewLineAtBiginningOfLine():
         outputValue.status = False
         return outputValue
 
-
 def makeLastCsv(argConncatLogTexDictList):
     """ AmazonConnectとCloud WatchのログがまとまったDictがListに纏まって
         渡されるので、Listを展開しながら、Dictをcsvファイルに保存していく。
@@ -298,7 +295,6 @@ def makeLastCsv(argConncatLogTexDictList):
         else:
             outputValue.status =False
             return outputValue
-
         # csvファイルの行頭に改行が入るので削除する処理。
         erasNewLineOutputValue = eraseNewLineAtBiginningOfLine()
         if erasNewLineOutputValue.status:
@@ -306,14 +302,11 @@ def makeLastCsv(argConncatLogTexDictList):
         else:
             outputValue.status =False
             return outputValue
-
     except Exception as e:
         print(e.args)
         print('csvファイルの作成に失敗しました。')
         outputValue.status =False
         return outputValue
-
-
     return outputValue  # 成功した場合はステータスTrueを返す
 
 if __name__ == "__main__":
@@ -324,8 +317,6 @@ if __name__ == "__main__":
             pass
         else:
             sys.exit()
-
-
         # dic型でCloud Watch のログを取り込む
         importWlogTxtOutputValue = import_wlog_txt()
         if importWlogTxtOutputValue.status:
@@ -333,7 +324,6 @@ if __name__ == "__main__":
             WlogClass.clwLogList = importWlogTxtOutputValue.return_Value
         else:
             sys.exit()
-
         # Amazon ConnectのコンタクトログとCloud Watchのログを結合する
         conncatLogTextDicList = []  # dic型で作成した結合した1行をまとめたList
         for csvRow  in importContactSrcCsvOutputValue.return_Value:
